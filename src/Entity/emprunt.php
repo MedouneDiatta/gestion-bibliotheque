@@ -5,8 +5,8 @@ namespace App\Entity;
 
 class Emprunt
 {
-    public const int MAX_EMPRUNTS_SIMULTANES=3;
-    public const int PENALITE_MAX=5000;
+    public const MAX_EMPRUNTS_SIMULTANES =3;
+    public const  PENALITE_MAX=5000;
     public readonly ?int $id;
     public readonly Document $document; // Remplacé Livre par Document
     public readonly string $adherent;
@@ -41,6 +41,12 @@ class Emprunt
         // Utilisation de la méthode polymorphe pour calculer la date de retour selon le document (Livre = 21j, DVD = 5j, etc.)
         $this->dateRetourPrevue = $dateRetourPrevue ?? $this->document->calculerDateRetour($this->dateEmprunt);
         $this->dateRetourEffective = null;
+    }
+
+    // methode static pour creer unj nouvel emprunt facilement
+    public static function nouveau(?int $id,Document $document,string $adherent):self 
+    {
+        return new self($id,$document,$adherent);
     }
 
     // --- GETTERS ---

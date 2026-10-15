@@ -57,4 +57,14 @@ if (isset($emprunt1)) {
     $emprunt1->marquerCommeRendu();
     echo "<p style='color:green;'>Livre rendu ! Nouveau stock disponible : " . $livre1->getExemplairesDispo() . "</p>";
 }
+
+// --- Test de la fabrique statique et des constantes de la Phase 5 ---
+echo "<h1>=====Test de la fabrique statique et des constante dela phase 5======</h1>";
+    echo "<p style='color:blue;'><strong>Test Phase 5 (Constants & Static) :</strong></p>";
+    echo "<p>Nombre max d'emprunts autorisés : " . Emprunt::MAX_EMPRUNTS_SIMULTANES . "</p>";
+    echo "<p>Pénalité maximale : " . Emprunt::PENALITE_MAX . " FCFA</p>";
+
+    // Utilisation du constructeur statique (fabrique)
+    $empruntStatique = Emprunt::nouveau(5, $livre1, "Mariama");
+    echo "<p style='color:green;'>Emprunt créé via la fabrique statique pour <strong>" . $empruntStatique->getAdherent() . "</strong></p>";
 ?>
