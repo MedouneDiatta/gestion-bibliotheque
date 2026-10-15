@@ -3,116 +3,63 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-class Livre
+final class Livre extends Document
 {
-    private string $titre;
     private string $auteur;
     private string $editeur;
-    private int $annee;
-    private int $exemplairesDispo; // Nom harmonisé au pluriel
+    public readonly string $isbn;
 
     public function __construct(
         string $titre,
         string $auteur,
         string $editeur,
         int $annee,
-        public readonly ?int $id,
-        public readonly string $isbn,
-        int $exemplairesDispo = 1 // Ajouté dans le constructeur avec une valeur par défaut
+        int $exemplairesTotal,
+        int $exemplairesDispo,
+        string $isbn,
+        ?int $id = null
     ) {
-        $this->setTitre($titre);
+        // On envoie les infos communes au constructeur parent (Document)
+        parent::__construct($titre, $annee, $exemplairesTotal, $exemplairesDispo, $id);
+        
         $this->setAuteur($auteur);
         $this->setEditeur($editeur);
-        $this->setAnnee($annee);
-        $this->setExemplairesDispo($exemplairesDispo);
+        $this->isbn = trim($isbn);
     }
 
-    // --- GETTERS ---
+    // --- Implémentation des méthodes abstraites obligatoires ---
 
-    public function getTitre(): string 
+    public function getDureeEmpruntJours(): int
     {
-        return $this->titre;
+        return 21; // Un livre se garde 21 jours selon le cahier des charges[cite: 1]
     }
 
-    public function getAuteur(): string 
+    public function getTarifPenaliteJour(): int
     {
-        return $this->auteur;
+        return 100; // 100 FCFA par jour de retard[cite: 1]
     }
 
-    public function getEditeur(): string
+    public function getType(): string
     {
-        return $this->editeur; 
+        return 'livre';
     }
 
-    public function getAnnee(): int 
-    {
-        return $this->annee;
-    }
+    // --- Getters et Setters spécifiques au Livre ---
 
-    public function getExemplairesDispo(): int 
-    {
-        return $this->exemplairesDispo;
-    }
+    public function getAuteur(): string { return $this->auteur; }
+    public function getEditeur(): string { return $this->editeur; }
 
-    // --- SETTERS AVEC VALIDATION ---
-
-    public function setTitre(string $titre): void 
-    {
-        $titre = trim($titre);
-        if ($titre === '') {
-            throw new \InvalidArgumentException("Le titre du livre est obligatoire.");
-        }
-        $this->titre = $titre;
-    }
-
-    public function setAuteur(string $auteur): void 
+    public function setAuteur(string $auteur): void
     {
         $auteur = trim($auteur);
         if ($auteur === '') {
-            throw new \InvalidArgumentException("L'auteur du livre est obligatoire.");
+            throw new \InvalidArgumentException("L'auteur est obligatoire.");
         }
         $this->auteur = $auteur;
     }
 
-    public function setEditeur(string $editeur): void 
+    public function setEditeur(string $editeur): void
     {
         $this->editeur = trim($editeur);
-    }
-
-    public function setAnnee(int $annee): void 
-    {
-        $anneeCourante = (int) date('Y'); // Définition de l'année courante
-        if ($annee < 1450 || $annee > $anneeCourante) {
-            throw new \InvalidArgumentException("L'année de publication est invalide.");
-        }
-        $this->annee = $annee; // Correction de la faute de frappe sur la variable ($annnee -> $annee)
-    }
-
-    public function setExemplairesDispo(int $exemplairesDispo): void 
-    {
-        if ($exemplairesDispo < 0) {
-            throw new \InvalidArgumentException("Le nombre d'exemplaires ne peut pas être négatif.");
-        }
-        $this->exemplairesDispo = $exemplairesDispo; // Assignation de la valeur qui manquait
-    }
-
-    // --- MÉTHODES MÉTIER ---
-
-    public function estDisponible(): bool 
-    {
-        return $this->exemplairesDispo > 0;
-    }
-
-    public function retirerExemplaire(): void 
-    {
-        if (!$this->estDisponible()) {
-            throw new \DomainException("Aucun exemplaire disponible à l'emprunt.");
-        }
-        $this->exemplairesDispo--;
-    }
-
-    public function ajouterExemplaire(): void 
-    {
-        $this->exemplairesDispo++;
     }
 }
