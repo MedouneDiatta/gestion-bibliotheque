@@ -5,6 +5,8 @@ namespace App\Entity;
 
 class Emprunt
 {
+    public const int MAX_EMPRUNTS_SIMULTANES=3;
+    public const int PENALITE_MAX=5000;
     public readonly ?int $id;
     public readonly Document $document; // Remplacé Livre par Document
     public readonly string $adherent;
