@@ -2,8 +2,9 @@
 declare(strict_types=1);
 
 namespace App\Entity;
+use App\Contract\Empruntable;
 
-abstract class Document
+abstract class Document implements Empruntable
 {
     protected string $titre;
     protected int $annee;
