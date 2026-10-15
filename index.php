@@ -67,4 +67,20 @@ echo "<h1>=====Test de la fabrique statique et des constante dela phase 5======<
     // Utilisation du constructeur statique (fabrique)
     $empruntStatique = Emprunt::nouveau(5, $livre1, "Mariama");
     echo "<p style='color:green;'>Emprunt créé via la fabrique statique pour <strong>" . $empruntStatique->getAdherent() . "</strong></p>";
+
+    echo "<h1>======Test pour las cas d'excetptions======</h1>";
+
+    
+    echo "<p style='color:blue;'><strong>Test Phase 6 (Exceptions) :</strong></p>";
+    
+    try {
+        // On simule une recherche d'un document qui n'existe pas en base (ex: ID 999)
+        $idRecherche = 999;
+        // Si on ne trouve rien, on lance notre exception personnalisée :
+        throw \App\Exception\NotFoundException::pour('Document', $idRecherche);
+
+    } catch (\App\Exception\NotFoundException $e) {
+        // On attrape l'exception et on affiche son message et son code HTTP
+        echo "<p style='color:orange;'><strong>Exception attrapée :</strong> " . $e->getMessage() . " (Code HTTP : " . $e->getCode() . ")</p>";
+    }
 ?>
