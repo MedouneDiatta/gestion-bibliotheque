@@ -2,10 +2,14 @@
 declare(strict_types=1);
 
 namespace App\Entity;
+
 use App\Contract\Empruntable;
+use App\Trait\Timestampable; // On importe le trait
 
 abstract class Document implements Empruntable
 {
+    use Timestampable; // On l'utilise dans la classe
+
     protected string $titre;
     protected int $annee;
     protected int $exemplairesTotal;
@@ -17,12 +21,15 @@ abstract class Document implements Empruntable
         int $exemplairesTotal,
         int $exemplairesDispo,
         public readonly ?int $id = null,
-        public readonly string $createdAt = ''
+        ?\DateTimeImmutable $createdAt = null // Optionnel pour hydrater si besoin depuis la base
     ) {
         $this->setTitre($titre);
         $this->setAnnee($annee);
         $this->setExemplairesTotal($exemplairesTotal);
         $this->setExemplairesDispo($exemplairesDispo);
+        
+        // Initialisation de la date de création via le trait Timestampable
+        $this->setCreatedAt($createdAt);
     }
 
     // --- Méthodes abstraites ---

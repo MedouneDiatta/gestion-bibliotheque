@@ -6,6 +6,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 use App\Entity\Livre;
 use App\Entity\Emprunt;
+use App\Entity\Dvd;
 
 echo "<h1>======= Test de la Bibliothèque =========</h1>";
 
@@ -23,6 +24,15 @@ try {
     );
     
     echo "<p style='color:green;'>Livre créé : " . $livre1->getTitre() . " (Stock : " . $livre1->getExemplairesDispo() . ")</p>";
+
+    // test de création d'un dvd
+
+    $dvd1= new Dvd("Inception","Christopher Nolan",148,2010,3,2);
+    echo "<p style='color:green;'>DVD créé : " . $dvd1->getTitre() . " (Durée d'emprunt : " . $dvd1->getDureeEmpruntJours() . " jours) | Ajouté le : " . $dvd1->getCreatedAt()->format('Y-m-d H:i:s') . "</p>";
+
+    // on test l'emprunt polymprque d'un dvd par alice
+    $empruntDvd = new Emprunt(1,$dvd1,"Alice");
+    echo "<p style='color:green;'>Emprunt du DVD réussi pour <strong>" . $empruntDvd->getAdherent() . "</strong>. Retour prévu le : " . $empruntDvd->getDateRetourPrevue()->format('Y-m-d') . "</p>";
 
     // Premier emprunt par Alice
     $emprunt1 = new Emprunt(1, $livre1, "Alice");
