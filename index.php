@@ -83,4 +83,22 @@ echo "<h1>=====Test de la fabrique statique et des constante dela phase 5======<
         // On attrape l'exception et on affiche son message et son code HTTP
         echo "<p style='color:orange;'><strong>Exception attrapée :</strong> " . $e->getMessage() . " (Code HTTP : " . $e->getCode() . ")</p>";
     }
+
+     echo "<h1>======Test Document Respository======</h1>";
+
+    // --- Test de la Phase 7 : DocumentRepository et MySQL ---
+    echo "<p style='color:blue;'><strong>Test Phase 7 (Repository & MySQL) :</strong></p>";
+
+    try {
+        // On instancie notre repository (le "bibliothécaire" de la base de données)
+        $docRepo = new \App\Repository\DocumentRepository();
+
+        // On va chercher le document avec l'ID 1 qu'on vient d'insérer dans MySQL
+        $monLivre = $docRepo->find(1);
+
+        echo "<p style='color:green;'>Livre récupéré depuis la base de données : <strong>" . $monLivre->getTitre() . "</strong> (Année : " . $monLivre->getAnnee() . ")</p>";
+
+    } catch (\Exception $e) {
+        echo "<p style='color:red;'>Erreur : " . $e->getMessage() . "</p>";
+    }
 ?>

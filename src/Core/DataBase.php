@@ -1,41 +1,40 @@
 <?php 
-  declare(strict_types=1);
+declare(strict_types=1);
 
-  namespace App\Core;
+namespace App\Core;
 
-   //   la class qui gère la connexion à la base de données via PDO
-
-  class DataBase 
-  {
+// La classe qui gère la connexion à la base de données via PDO
+class DataBase 
+{
     private static ?\PDO $instance = null;
 
-    // une function qui return une instance unique ou une nouvelle instance de connexion pdo
-    public static function getConnection():\PDO 
+    // Une fonction qui retourne une instance unique ou une nouvelle instance de connexion PDO
+    public static function getConnection(): \PDO 
     {
-        if(self::$instance === null)
-            {
-                $host = 'localhost';
-                $db = 'bibliotech';
-                $user = 'root';
-                $pass = '';//par defaut sous xampp le mot passe est vide
-                $dsn = 'mysql:host=$host;dname=$db;charset=$charset';
+        if (self::$instance === null) {
+            $host = 'localhost';
+            $db = 'bibliotech';
+            $user = 'root';
+            $pass = ''; // Par défaut sous XAMPP, le mot de passe est vide
+            $charset = 'utf8mb4';
 
-              $options = [
-                \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION, // Lance des exceptions en cas d'erreur SQL
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,       // Récupère les résultats sous forme de tableaux associatifs
-                \PDO::ATTR_EMULATE_PREPARES   => false,                   // Utilise les vraies requêtes préparées
+            // Utilisation de guillemets doubles pour que les variables soient bien lues
+            $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+
+            $options = [
+                \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION, 
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,       
+                \PDO::ATTR_EMULATE_PREPARES   => false,                   
             ];
 
-            try
-            {
-                self::$instance = new \PDO($dsn,$user,$pass,$option);
+            try {
+                // Bien utiliser $options avec un 's'
+                self::$instance = new \PDO($dsn, $user, $pass, $options);
+            } catch (\PDOException $e) {
+                throw new \RuntimeException("Erreur de connexion à la base de données : " . $e->getMessage());
             }
-            catch(\PDOException $e)
-            {
-                throw new \RuntimeException("Erreur de connexion  à la base de données : " . $e->getMessage());
-            }
-            }
-            return self::$instance;
+        }
+        return self::$instance;
     }
-  }
+}
 ?>

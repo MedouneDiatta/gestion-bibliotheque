@@ -36,6 +36,12 @@ abstract class AbstractRepository implements RepositoryInterface
         return $this->hydrater($ligne);
     }
 
+    // enregistre ou met à jour une entite
+    public function save(object $entite):bool
+    {
+        return true;
+    }
+
     // Récupère tous les enregistrements de la table
     public function findAll(): array 
     {

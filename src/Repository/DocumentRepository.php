@@ -12,7 +12,7 @@ final class DocumentRepository extends AbstractRepository
 {
     protected string $table = "documents";
 
-    // Une fonction qui transforme un tableau associatif SQL en un objet concret
+    // Transforme un tableau associatif SQL brut en un objet concret (Livre, Dvd, etc.)
     protected function hydrater(array $ligne): Document
     {
         $type = TypeDocument::from($ligne['type']);
@@ -27,8 +27,7 @@ final class DocumentRepository extends AbstractRepository
                 exemplairesTotal: (int) $ligne['exemplaires_total'],
                 exemplairesDispo: (int) $ligne['exemplaires_dispo'],
                 isbn: $ligne['isbn'] ?? '',
-                id: (int) $ligne['id'],
-                createdAt: new \DateTimeImmutable($ligne['created_at'])
+                id: (int) $ligne['id']
             ),
             TypeDocument::Dvd => new Dvd(
                 titre: $ligne['titre'],
