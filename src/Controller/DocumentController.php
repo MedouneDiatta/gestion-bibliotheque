@@ -13,12 +13,21 @@ class DocumentController
 
         try 
         {
-            $document = $repo->find(1);
+            // On récupère tous les documents avec findAll()
+            $documents = $repo->findAll();
             $html = "<h1>Liste des documents de la bibliothèque 📚</h1>";
 
-            if ($document) 
+            if (!empty($documents)) 
             {
-                $html .= "<p style='color:green;'>Document trouvé en base : <strong>" . $document->getTitre() . "</strong> (Type : " . $document->getType() . ", Année : " . $document->getAnnee() . ")</p>";
+                $html .= "<ul>";
+                foreach ($documents as $document) 
+                {
+                    $html .= "<li>";
+                    $html .= "<strong>" . htmlspecialchars($document->getTitre()) . "</strong> ";
+                    $html .= "(Type : " . htmlspecialchars($document->getType()) . ", Année : " . $document->getAnnee() . ")";
+                    $html .= "</li>";
+                }
+                $html .= "</ul>";
             } 
             else 
             {
