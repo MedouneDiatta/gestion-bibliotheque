@@ -1,0 +1,50 @@
+<?php 
+  declare(strict_types=1);
+  namespace App\Repository;
+
+  use App\Entity\Utilisateur;
+  use App\Entity\Membre;
+  use App\Entity\Bibliothecaire;
+  use App\Entity\Administrateur;
+
+  final class UtilisateurRepository extends AbstractRepository
+  {
+    protected string $table = 'utilisateur';
+
+    // uen fonction qui permet de transformer une ligne de la base de donnés(tableau associatif en un objet php)
+    protected function hydrater(array $ligne):Utilisateur
+    {
+        return match($ligne['role'])
+        {
+            'admin' => new Administrateur
+            (
+                (int)$ligne['id'], 
+                $ligne['nom'], 
+                $ligne['prenom'], 
+                $ligne['email'], 
+                $ligne['mot_de_passe'], 
+                $ligne['role']
+            ),
+
+            'bibliothecaire' => new Bibliothecaire
+            (
+                (int)$ligne['id'], 
+                $ligne['nom'], 
+                $ligne['prenom'], 
+                $ligne['email'], 
+                $ligne['mot_de_passe'], 
+                $ligne['role']
+            ),
+            default => new Membre
+            (
+                (int)$ligne['id'], 
+                $ligne['nom'], 
+                $ligne['prenom'], 
+                $ligne['email'], 
+                $ligne['mot_de_passe'], 
+                $ligne['role']
+            ),
+        };
+    }
+  }
+?>
