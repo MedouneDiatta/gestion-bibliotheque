@@ -62,4 +62,15 @@ final class Livre extends Document
     {
         $this->editeur = trim($editeur);
     }
+
+    // foncton qui ajoute cette methode si elle manquait
+    public function getIsbn():? string
+    {
+        return $this->isbn;
+    }
+
+    public function setIsbn(?string $isbn):void 
+    {
+        $this->isbn=$isbn;
+    }
 }

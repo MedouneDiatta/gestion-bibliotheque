@@ -8,21 +8,24 @@ use App\Core\Request;
 use App\Core\Router;
 use App\Controller\DocumentController;
 
-// 2. On instancie la requête pour écouter l'URL du navigateur
+//  On instancie la requête pour écouter l'URL du navigateur
 $request = new Request();
 
-// 3. On instancie le routeur
+//  On instancie le routeur
 $router = new Router();
 
-// 4. On définit nos routes
+//  On définit nos routes
 $router->get('/Bibliotech/', function() {
-    return "<h1>Bienvenue sur l'accueil de Bibliotech ! 📚 (Phase 8)</h1>";
+    return "<h1>Bienvenue sur l'accueil de Bibliotech !</h1>";
 });
 
-// On conserve uniquement la route qui utilise le DocumentController
+// Route pour lister tous les documents
 $router->get('/Bibliotech/documents', [DocumentController::class, 'index']);
 
-// 5. Le routeur analyse l'URL actuelle et exécute l'action correspondante
+//  Route pour afficher la fiche détaillée d'un document
+$router->get('/Bibliotech/documents/show', [DocumentController::class, 'show']);
+
+//  Le routeur analyse l'URL actuelle et exécute l'action correspondante
 try {
     $response = $router->resolve($request);
     echo $response; // On affiche le résultat au navigateur

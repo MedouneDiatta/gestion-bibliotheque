@@ -5,8 +5,11 @@
         <?php foreach ($documents as $document): ?>
             <li>
                 <div>
-                    <strong><?= htmlspecialchars($document->getTitre()) ?></strong> 
-                    <small>(Année : <?= $document->getAnnee() ?>)</small>
+                    <!-- Lien propre sans soulignement vers la fiche du document -->
+                    <a href="/Bibliotech/documents/show?id=<?= $document->id ?>" style="text-decoration: none; color: #2c3e50;">
+    <strong><?= htmlspecialchars($document->getTitre()) ?></strong>
+</a>
+                    <small style="color: #666;">(Année : <?= $document->getAnnee() ?>)</small>
                 </div>
                 <span class="badge"><?= htmlspecialchars($document->getType()) ?></span>
             </li>
