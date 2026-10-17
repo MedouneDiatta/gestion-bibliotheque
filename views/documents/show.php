@@ -29,6 +29,12 @@
     <?php endif; ?>
 </div>
 
+<!-- bouton modification -->
+ <a href="/Bibliotech/documents/edit?id=<?= $document->id ?>" 
+   style="background: #f39c12; color: white; padding: 10px 18px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block;">
+    Modifier ce document
+</a>
+
 <!-- Boutons d'action -->
 <div style="margin-top: 20px;">
     <a href="/Bibliotech/documents/delete?id=<?= $document->id ?>" 

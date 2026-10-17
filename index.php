@@ -34,6 +34,10 @@ $router->post('/Bibliotech/documents/store', [DocumentController::class, 'store'
 // route pour supprmer des docments
 $router->get('/Bibliotech/documents/delete', [DocumentController::class, 'delete']);
 
+// route pour la modification des document
+$router->get('/Bibliotech/documents/edit', [DocumentController::class, 'edit']);
+$router->post('/Bibliotech/documents/update', [DocumentController::class, 'update']);
+
 //  Le routeur analyse l'URL actuelle et exécute l'action correspondante
 try {
     $response = $router->resolve($request);

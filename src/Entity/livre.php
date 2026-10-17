@@ -7,7 +7,7 @@ final class Livre extends Document
 {
     private string $auteur;
     private string $editeur;
-    public readonly string $isbn;
+    public ?string $isbn; // 💡 Mis en ?string pour accepter les valeurs nulles
 
     public function __construct(
         string $titre,
@@ -16,7 +16,7 @@ final class Livre extends Document
         int $annee,
         int $exemplairesTotal,
         int $exemplairesDispo,
-        string $isbn,
+        ?string $isbn = null,
         ?int $id = null
     ) {
         // On envoie les infos communes au constructeur parent (Document)
@@ -24,19 +24,19 @@ final class Livre extends Document
         
         $this->setAuteur($auteur);
         $this->setEditeur($editeur);
-        $this->isbn = trim($isbn);
+        $this->isbn = $isbn ? trim($isbn) : null;
     }
 
     // --- Implémentation des méthodes abstraites obligatoires ---
 
     public function getDureeEmpruntJours(): int
     {
-        return 21; // Un livre se garde 21 jours selon le cahier des charges[cite: 1]
+        return 21; // Un livre se garde 21 jours
     }
 
     public function getTarifPenaliteJour(): int
     {
-        return 100; // 100 FCFA par jour de retard[cite: 1]
+        return 100; // 100 FCFA par jour de retard
     }
 
     public function getType(): string
@@ -63,14 +63,13 @@ final class Livre extends Document
         $this->editeur = trim($editeur);
     }
 
-    // foncton qui ajoute cette methode si elle manquait
-    public function getIsbn():? string
+    public function getIsbn(): ?string
     {
         return $this->isbn;
     }
 
-    public function setIsbn(?string $isbn):void 
+    public function setIsbn(?string $isbn): void 
     {
-        $this->isbn=$isbn;
+        $this->isbn = $isbn ? trim($isbn) : null;
     }
 }
