@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Repository\DocumentRepository;
+use App\Core\View;
 
 class DocumentController
 {
@@ -11,33 +12,15 @@ class DocumentController
     {
         $repo = new DocumentRepository();
 
-        try 
-        {
-            // On récupère tous les documents avec findAll()
+        try {
             $documents = $repo->findAll();
-            $html = "<h1>Liste des documents de la bibliothèque 📚</h1>";
 
-            if (!empty($documents)) 
-            {
-                $html .= "<ul>";
-                foreach ($documents as $document) 
-                {
-                    $html .= "<li>";
-                    $html .= "<strong>" . htmlspecialchars($document->getTitre()) . "</strong> ";
-                    $html .= "(Type : " . htmlspecialchars($document->getType()) . ", Année : " . $document->getAnnee() . ")";
-                    $html .= "</li>";
-                }
-                $html .= "</ul>";
-            } 
-            else 
-            {
-                $html .= "<p>Aucun document trouvé.</p>";
-            }
-
-            return $html;
+            // On appelle notre système de vue en lui passant les données
+            return View::render('documents/index', [
+                'documents' => $documents
+            ]);
         }
-        catch (\Exception $e) 
-        {
+        catch (\Exception $e) {
             return "<p style='color:red;'>Erreur : " . $e->getMessage() . "</p>";
         }
     }
