@@ -28,3 +28,12 @@
         <p><strong>Durée :</strong> <?= $document->getDureeMinutes() ?> minutes</p>
     <?php endif; ?>
 </div>
+
+<!-- Boutons d'action -->
+<div style="margin-top: 20px;">
+    <a href="/Bibliotech/documents/delete?id=<?= $document->id ?>" 
+       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce document ?');" 
+       style="background: #e74c3c; color: white; padding: 10px 18px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block;">
+         Supprimer ce document
+    </a>
+</div>

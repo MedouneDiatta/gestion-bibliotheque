@@ -31,6 +31,9 @@ $router->get('/Bibliotech/documents/create', [DocumentController::class, 'create
 // Route pour enregistrer les données du formulaire en base de données
 $router->post('/Bibliotech/documents/store', [DocumentController::class, 'store']);
 
+// route pour supprmer des docments
+$router->get('/Bibliotech/documents/delete', [DocumentController::class, 'delete']);
+
 //  Le routeur analyse l'URL actuelle et exécute l'action correspondante
 try {
     $response = $router->resolve($request);

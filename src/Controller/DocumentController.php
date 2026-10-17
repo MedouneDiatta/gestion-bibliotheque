@@ -107,4 +107,32 @@ class DocumentController
             echo "<p style='color:red;'>Erreur lors de l'enregistrement : " . $e->getMessage() . "</p>";
         }
     }
+
+    // une fonction qui permet de supprimer un document par son id
+    public function delete():void 
+    {
+        $id = isset($_GET['id']) ? (int)$_GET['id'] :0;
+        $repo = new DocumentRepository();
+
+        try 
+        {
+            // on supprime le ducment
+            $repo->delete($id);
+
+            // message succès
+            $_SESSION['success'] = "Le document a été supprimé avec succès !";
+        }
+        catch(\Exception $e)
+        {
+            $_SESSION['error'] = "Erreur lors de la supression : " . $e->getMessage();
+        }
+
+        // redirection vers la liste
+        header('Location: /Bibliotech/documents');
+        exit();
+
+    }
+
 }
+
+?>
