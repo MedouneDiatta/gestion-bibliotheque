@@ -4,47 +4,55 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Core\Request;
-use App\Core\Response;
 use App\Service\AuthService;
+use App\Repository\UtilisateurRepository; // <-- N'oublie pas l'import
+use App\Core\View;
 
-final class AuthController extends Controller
+final class AuthController
 {
-    public function __construct(private AuthService $authService)
+    private AuthService $authService;
+
+    public function __construct()
     {
+        // On instancie AuthService en lui fournissant son UtilisateurRepository
+        $this->authService = new AuthService(new UtilisateurRepository());
     }
 
-    // La fonction qui affiche le formulaire de connexion avec GET /login
-    public function loginForm(Request $request): Response 
+    // Affiche le formulaire de connexion (GET /login)
+    public function loginForm(): string 
     {
         if ($this->authService->estConnecte()) {
-            return $this->redirect('/documents');
+            header('Location: /Bibliotech/documents');
+            exit();
         }
-        return $this->view('auth/login');
+        return View::render('auth/login');
     }
 
-    // La fonction qui traite la soumission du formulaire de connexion
-    public function login(Request $request): Response 
+    // Traite la soumission du formulaire de connexion (POST /login)
+    public function login(): void 
     {
-        $email = $request->input('email', '');
-        $motDePasse = $request->input('mot_de_passe', ''); // Corrigé : input au lieu de intput
+        $email = $_POST['email'] ?? '';
+        $motDePasse = $_POST['mot_de_passe'] ?? '';
 
-        // Tentative de connexion via le service
         $utilisateur = $this->authService->connecter($email, $motDePasse);
 
         if ($utilisateur === null) {
-            return $this->view('auth/login', [ // Corrigé : ajout de la virgule après 'auth/login'
+            echo View::render('auth/login', [
                 'erreur' => 'Email ou mot de passe incorrect.',
                 'email' => $email
             ]);
+            return;
         }
 
-        return $this->redirect('/documents');
+        header('Location: /Bibliotech/documents');
+        exit();
     }
 
-    // La fonction qui déconnecte l'utilisateur avec GET /logout
-    public function logout(Request $request): Response 
+    // Déconnecte l'utilisateur (GET /logout)
+    public function logout(): void 
     {
         $this->authService->deconnecter();
-        return $this->redirect('/login');
+        header('Location: /Bibliotech/login');
+        exit();
     }
 }

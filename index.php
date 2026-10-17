@@ -8,6 +8,7 @@ use App\Core\Request;
 use App\Core\Router;
 use App\Controller\DocumentController;
 use App\Controller\Admin\UtilisateurController;
+use App\Controller\AuthController;
 
 
 //  On instancie la requête pour écouter l'URL du navigateur
@@ -42,6 +43,11 @@ $router->post('/Bibliotech/documents/update', [DocumentController::class, 'updat
 
 // Route pour lister tous les utilisateurs / membres
 $router->get('/Bibliotech/admin/utilisateurs', [UtilisateurController::class, 'index']);
+
+// Routes d'authentification
+$router->get('/login', [AuthController::class, 'loginForm']);
+$router->post('/login', [AuthController::class, 'login']);
+$router->get('/logout', [AuthController::class, 'logout']);
 
 //  Le routeur analyse l'URL actuelle et exécute l'action correspondante
 try {
