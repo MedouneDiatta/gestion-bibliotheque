@@ -20,6 +20,7 @@ abstract class Utilisateur
     public function getPrenom(): string { return $this->prenom; }
     public function getEmail(): string { return $this->email; }
     public function getRole(): string { return $this->role; }
+    public function getMotDePasse(): string { return $this->motDePasse; }
 
     // Les méthodes abstraites
     abstract public function peutGererCatalogue(): bool;

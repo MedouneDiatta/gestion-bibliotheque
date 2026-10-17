@@ -42,4 +42,17 @@ final class UtilisateurRepository extends AbstractRepository
             ),
         };
     }
+
+    public function findParEmail(string $email): ?Utilisateur
+{
+    $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE email = :email");
+    $stmt->execute(['email' => $email]);
+    $ligne = $stmt->fetch();
+
+    if ($ligne === false) {
+        return null;
+    }
+
+    return $this->hydrater($ligne);
+}
 }
