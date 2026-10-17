@@ -1,17 +1,17 @@
-<?php 
-  declare(strict_types=1);
-  namespace App\Entity;
+<?php
+declare(strict_types=1);
 
-  final class Membre extends Utilisateur
-  {
-    public function peutGererCatalogue():bool 
+namespace App\Entity;
+
+final class Membre extends Utilisateur
+{
+    public function peutGererCatalogue(): bool
     {
-        return false;//parce qu'un memebre ne peu pas modifier les livre
+        return false;
     }
 
-    public function peutGererUtilisateur():bool 
+    public function peutGererUtilisateurs(): bool
     {
-        return false; //un membre ne gère pas les compte
+        return false;
     }
-  }
-?>
+}

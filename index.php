@@ -7,6 +7,8 @@ require_once __DIR__ . '/vendor/autoload.php';
 use App\Core\Request;
 use App\Core\Router;
 use App\Controller\DocumentController;
+use App\Controller\Admin\UtilisateurController;
+
 
 //  On instancie la requête pour écouter l'URL du navigateur
 $request = new Request();
@@ -37,6 +39,9 @@ $router->get('/Bibliotech/documents/delete', [DocumentController::class, 'delete
 // route pour la modification des document
 $router->get('/Bibliotech/documents/edit', [DocumentController::class, 'edit']);
 $router->post('/Bibliotech/documents/update', [DocumentController::class, 'update']);
+
+// Route pour lister tous les utilisateurs / membres
+$router->get('/Bibliotech/admin/utilisateurs', [UtilisateurController::class, 'index']);
 
 //  Le routeur analyse l'URL actuelle et exécute l'action correspondante
 try {

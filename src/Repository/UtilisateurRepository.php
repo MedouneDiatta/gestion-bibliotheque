@@ -1,23 +1,22 @@
 <?php 
-  declare(strict_types=1);
-  namespace App\Repository;
+declare(strict_types=1);
 
-  use App\Entity\Utilisateur;
-  use App\Entity\Membre;
-  use App\Entity\Bibliothecaire;
-  use App\Entity\Administrateur;
+namespace App\Repository;
 
-  final class UtilisateurRepository extends AbstractRepository
-  {
-    protected string $table = 'utilisateur';
+use App\Entity\Utilisateur;
+use App\Entity\Membre;
+use App\Entity\Bibliothecaire;
+use App\Entity\Administrateur;
 
-    // uen fonction qui permet de transformer une ligne de la base de donnés(tableau associatif en un objet php)
-    protected function hydrater(array $ligne):Utilisateur
+final class UtilisateurRepository extends AbstractRepository
+{
+    protected string $table = 'utilisateurs'; // 👈 Corrigé au pluriel (utilisateurs)
+
+    protected function hydrater(array $ligne): Utilisateur
     {
         return match($ligne['role'])
         {
-            'admin' => new Administrateur
-            (
+            'admin' => new Administrateur(
                 (int)$ligne['id'], 
                 $ligne['nom'], 
                 $ligne['prenom'], 
@@ -25,9 +24,7 @@
                 $ligne['mot_de_passe'], 
                 $ligne['role']
             ),
-
-            'bibliothecaire' => new Bibliothecaire
-            (
+            'bibliothecaire' => new Bibliothecaire(
                 (int)$ligne['id'], 
                 $ligne['nom'], 
                 $ligne['prenom'], 
@@ -35,8 +32,7 @@
                 $ligne['mot_de_passe'], 
                 $ligne['role']
             ),
-            default => new Membre
-            (
+            default => new Membre(
                 (int)$ligne['id'], 
                 $ligne['nom'], 
                 $ligne['prenom'], 
@@ -46,5 +42,4 @@
             ),
         };
     }
-  }
-?>
+}
