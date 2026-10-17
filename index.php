@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-
+session_start();
 // 1. On charge l'autoloader unique de Composer
 require_once __DIR__ . '/vendor/autoload.php';
 

@@ -1,5 +1,13 @@
 <h2>Liste des documents</h2>
 
+<!-- Message de succès après l'ajout d'un document -->
+<?php if (isset($_SESSION['success'])): ?>
+    <div style="background-color: #d4edda; color: #155724; padding: 12px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #c3e6cb;">
+         <?= htmlspecialchars($_SESSION['success']) ?>
+    </div>
+    <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
+
 <!-- Bouton pour accéder au formulaire de création -->
 <p>
     <a href="/Bibliotech/documents/create" style="background: #3498db; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold;">

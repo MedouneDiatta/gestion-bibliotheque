@@ -6,6 +6,8 @@ namespace App\Controller;
 use App\Repository\DocumentRepository;
 use App\Core\View;
 use App\Exception\NotFoundException;
+use App\Entity\Livre;
+use App\Entity\Dvd;
 
 class DocumentController
 {
@@ -63,6 +65,7 @@ class DocumentController
         $type = $_POST['type'] ?? 'livre';
         $auteur = $_POST['auteur'] ?? null;
         $editeur = $_POST['editeur'] ?? null;
+        $isbn = $_POST['isbn'] ?? '';
 
         $repo = new DocumentRepository();
 
@@ -75,7 +78,8 @@ class DocumentController
                     editeur: $editeur,
                     annee: $annee,
                     exemplairesTotal: 3, // Valeur par défaut par exemple
-                    exemplairesDispo: 3
+                    exemplairesDispo: 3,
+                    isbn: $isbn
                 );
             } else {
                 // Si c'est un DVD
@@ -91,6 +95,9 @@ class DocumentController
 
             // On sauvegarde en base de données
             $repo->save($document);
+
+            // on stock un message de succès en session
+            $_SESSION['success'] = "Le document a été ajouté avec succès !";
 
             // Redirection vers la liste après succès
             header('Location: /Bibliotech/documents');
