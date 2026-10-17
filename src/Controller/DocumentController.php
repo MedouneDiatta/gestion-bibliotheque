@@ -31,26 +31,73 @@ class DocumentController
     {
         $repo = new DocumentRepository();
 
-        // 1. On récupère l'identifiant passé dans l'URL (ex: /documents/show?id=1)
         $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
         try {
-            // 2. On demande au Repository de trouver le document par son ID
-            // Si l'ID n'existe pas, la méthode find() lèvera une NotFoundException
             $document = $repo->find($id);
 
-            // 3. On transmet le document trouvé à la vue "documents/show"
             return View::render('documents/show', [
                 'document' => $document
             ]);
         }
         catch (NotFoundException $e) {
-            // Si le document est introuvable (ex: id = 9999)
-            return "<p style='color:orange;'> " . $e->getMessage() . "</p><a href='/documents'>Retour à la liste</a>";
+            // CORRECTION : Ajout de /Bibliotech/ dans le lien de retour
+            return "<p style='color:orange;'> " . $e->getMessage() . "</p><a href='/Bibliotech/documents'>Retour à la liste</a>";
         }
         catch (\Exception $e) {
-            // Pour toute autre erreur inattendue
             return "<p style='color:red;'>Erreur : " . $e->getMessage() . "</p>";
+        }
+    }
+
+    // Affiche le formulaire de création
+    public function create(): string 
+    {
+        return View::render('documents/create');
+    }
+
+    // Traite la soumission du formulaire et enregistre en BDD
+   public function store(): void 
+    {
+        $titre = $_POST['titre'] ?? '';
+        $annee = isset($_POST['annee']) ? (int)$_POST['annee'] : 0;
+        $type = $_POST['type'] ?? 'livre';
+        $auteur = $_POST['auteur'] ?? null;
+        $editeur = $_POST['editeur'] ?? null;
+
+        $repo = new DocumentRepository();
+
+        try {
+            if ($type === 'livre') {
+                // On instancie un objet Livre
+                $document = new Livre(
+                    titre: $titre,
+                    auteur: $auteur,
+                    editeur: $editeur,
+                    annee: $annee,
+                    exemplairesTotal: 3, // Valeur par défaut par exemple
+                    exemplairesDispo: 3
+                );
+            } else {
+                // Si c'est un DVD
+                $document = new Dvd(
+                    titre: $titre,
+                    realisateur: $_POST['realisateur'] ?? 'Inconnu',
+                    dureeMinutes: (int)($_POST['duree_minutes'] ?? 120),
+                    annee: $annee,
+                    exemplairesTotal: 3,
+                    exemplairesDispo: 3
+                );
+            }
+
+            // On sauvegarde en base de données
+            $repo->save($document);
+
+            // Redirection vers la liste après succès
+            header('Location: /Bibliotech/documents');
+            exit();
+        }
+        catch (\Exception $e) {
+            echo "<p style='color:red;'>Erreur lors de l'enregistrement : " . $e->getMessage() . "</p>";
         }
     }
 }

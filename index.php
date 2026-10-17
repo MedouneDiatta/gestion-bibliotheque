@@ -25,6 +25,12 @@ $router->get('/Bibliotech/documents', [DocumentController::class, 'index']);
 //  Route pour afficher la fiche détaillée d'un document
 $router->get('/Bibliotech/documents/show', [DocumentController::class, 'show']);
 
+// Route pour afficher le formulaire d'ajout d'un document
+$router->get('/Bibliotech/documents/create', [DocumentController::class, 'create']);
+
+// Route pour enregistrer les données du formulaire en base de données
+$router->post('/Bibliotech/documents/store', [DocumentController::class, 'store']);
+
 //  Le routeur analyse l'URL actuelle et exécute l'action correspondante
 try {
     $response = $router->resolve($request);
