@@ -96,4 +96,9 @@ final class Emprunt
     {
         $this->prolonge = true;
     }
+
+    public function setDateRetourPrevue(\DateTimeImmutable $dateRetourPrevue): void
+    {
+        $this->dateRetourPrevue = $dateRetourPrevue;
+    }
 }

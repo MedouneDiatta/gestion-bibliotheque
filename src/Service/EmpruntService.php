@@ -145,4 +145,57 @@ final class EmpruntService
             throw $e;
         }
     }
+
+    /**
+     * Prolonge un emprunt existant d'une durée équivalente, si les conditions sont réunies.
+     */
+    public function prolonger(int $empruntId): Emprunt
+    {
+        // Récupérer l'emprunt
+        $emprunt = $this->empruntRepository->find($empruntId);
+
+        //  Vérifier si l'emprunt est bien en cours
+        if ($emprunt->getStatut() !== \App\Enum\StatutEmprunt::EnCours) {
+            throw new BiblioTechException("Impossible de prolonger cet emprunt : il n'est plus actif.");
+        }
+
+        //  Vérifier s'il n'a pas déjà été prolongé
+        if ($emprunt->isProlonge()) {
+            throw new BiblioTechException("Cet emprunt a déjà été prolongé une fois (limite atteinte).");
+        }
+
+        //  Vérifier que l'emprunt n'est pas déjà en retard par rapport à la date du jour
+        $dateActuelle = new \DateTimeImmutable();
+        if ($dateActuelle > $emprunt->getDateRetourPrevue()) {
+            throw new BiblioTechException("Impossible de prolonger un emprunt qui est déjà en retard.");
+        }
+
+        //  Récupérer le document pour connaître sa durée d'emprunt initiale
+        $document = $this->documentRepository->find($emprunt->getDocumentId());
+        $dureeJours = $document->getDureeEmpruntJours();
+
+        //  Calculer la nouvelle date de retour prévue (à partir de l'ancienne date prévue ou de la date actuelle)
+        $nouvelleDateRetour = $emprunt->getDateRetourPrevue()->modify("+{$dureeJours} days");
+
+        //  Mettre à jour l'emprunt
+        $this->pdo->beginTransaction();
+
+        try {
+            // Mettre à jour la date de retour prévue et marquer comme prolongé
+            // (Assure-toi d'avoir une méthode setDateRetourPrevue dans l'entité Emprunt si elle n'y est pas)
+            $emprunt->setDateRetourPrevue($nouvelleDateRetour);
+            $emprunt->marquerCommeProlonge();
+
+            // Sauvegarder les modifications via le repository
+            $this->empruntRepository->save($emprunt);
+
+            $this->pdo->commit();
+
+            return $emprunt;
+
+        } catch (\Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
+    }
 }
