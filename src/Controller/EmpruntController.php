@@ -26,14 +26,18 @@ final class EmpruntController
     /**
      * Affiche la liste des emprunts en cours pour un membre donné.
      */
-    public function mesEmprunts(int $membreId): void 
+   public function mesEmprunts(int $membreId): void 
     {
         try {
             // Récupère les emprunts en cours depuis la base de données
             $emprunts = $this->empruntRepository->findEnCoursPourMembre($membreId);
 
+            // Charger la vue HTML
+            require_once __DIR__ . '/../View/emprunts/mes-emprunts.php';
+
         } catch (\Throwable $e) {
             $erreur = $e->getMessage();
+            require_once __DIR__ . '/../View/emprunts/mes-emprunts.php';
         }
     }
 
