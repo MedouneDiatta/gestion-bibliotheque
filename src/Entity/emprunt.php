@@ -1,53 +1,27 @@
-<?php 
+<?php
 declare(strict_types=1);
 
 namespace App\Entity;
 
-class Emprunt
+use App\Enum\StatutEmprunt;
+
+final class Emprunt
 {
-    public const MAX_EMPRUNTS_SIMULTANES =3;
-    public const  PENALITE_MAX=5000;
-    public readonly ?int $id;
-    public readonly Document $document; // Remplacé Livre par Document
-    public readonly string $adherent;
-    public readonly \DateTimeImmutable $dateEmprunt;
-    private \DateTimeImmutable $dateRetourPrevue; 
-    private ?\DateTimeImmutable $dateRetourEffective;
+    public const MAX_EMPRUNTS_SIMULTANES = 3;
+    public const PENALITE_MAX = 5000;
 
     public function __construct(
-        ?int $id,
-        Document $document, // Remplacé Livre par Document
-        string $adherent,
-        ?\DateTimeImmutable $dateEmprunt = null,
-        ?\DateTimeImmutable $dateRetourPrevue = null 
-    ) {
-        if (!$document->estDisponible()) {
-            throw new \DomainException("Ce document n'est plus disponible à l'emprunt.");
-        }
-        
-        $document->retirerExemplaire();
-        
-        $this->id = $id;
-        $this->document = $document;
-
-        $adherentNettoye = trim($adherent);
-        if ($adherentNettoye === '') {
-            throw new \InvalidArgumentException("Le nom de l'adhérent est obligatoire.");
-        }
-        $this->adherent = $adherentNettoye;
-
-        $this->dateEmprunt = $dateEmprunt ?? new \DateTimeImmutable();
-
-        // Utilisation de la méthode polymorphe pour calculer la date de retour selon le document (Livre = 21j, DVD = 5j, etc.)
-        $this->dateRetourPrevue = $dateRetourPrevue ?? $this->document->calculerDateRetour($this->dateEmprunt);
-        $this->dateRetourEffective = null;
-    }
-
-    // methode static pour creer unj nouvel emprunt facilement
-    public static function nouveau(?int $id,Document $document,string $adherent):self 
-    {
-        return new self($id,$document,$adherent);
-    }
+        public readonly ?int $id,
+        public readonly int $documentId,
+        public readonly int $membreId,
+        public readonly \DateTimeImmutable $dateEmprunt,
+        private \DateTimeImmutable $dateRetourPrevue,
+        private ?\DateTimeImmutable $dateRetourReelle = null,
+        private bool $prolonge = false,
+        private int $penalite = 0,
+        private bool $penalitePayee = false,
+        private StatutEmprunt $statut = StatutEmprunt::EnCours
+    ) {}
 
     // --- GETTERS ---
 
@@ -56,46 +30,70 @@ class Emprunt
         return $this->id;
     }
 
-    public function getDocument(): Document 
+    public function getDocumentId(): int
     {
-        return $this->document; 
+        return $this->documentId;
     }
 
-    public function getAdherent(): string 
+    public function getMembreId(): int
     {
-        return $this->adherent; 
+        return $this->membreId;
     }
 
-    public function getDateEmprunt(): \DateTimeImmutable 
+    public function getDateEmprunt(): \DateTimeImmutable
     {
-        return $this->dateEmprunt; 
+        return $this->dateEmprunt;
     }
 
-    public function getDateRetourPrevue(): \DateTimeImmutable 
+    public function getDateRetourPrevue(): \DateTimeImmutable
     {
         return $this->dateRetourPrevue;
     }
 
-    public function getDateRetourEffective(): ?\DateTimeImmutable
+    public function getDateRetourReelle(): ?\DateTimeImmutable
     {
-        return $this->dateRetourEffective;
+        return $this->dateRetourReelle;
     }
 
-    // --- MÉTHODES MÉTIER ---
-
-    public function estRendu(): bool 
+    public function isProlonge(): bool
     {
-        return $this->dateRetourEffective !== null;
+        return $this->prolonge;
     }
 
-    public function marquerCommeRendu(?\DateTimeImmutable $dateEffective = null): void 
+    public function getPenalite(): int
     {
-        if ($this->estRendu()) {
-            throw new \DomainException("Ce document a déjà été retourné."); 
-        }
+        return $this->penalite;
+    }
 
-        $this->dateRetourEffective = $dateEffective ?? new \DateTimeImmutable();
-        
-        $this->document->ajouterExemplaire();
+    public function isPenalitePayee(): bool
+    {
+        return $this->penalitePayee;
+    }
+
+    public function getStatut(): StatutEmprunt
+    {
+        return $this->statut;
+    }
+
+    // --- SETTERS / MÉTHODES MÉTIER ---
+
+    public function setDateRetourReelle(?\DateTimeImmutable $dateRetourReelle): void
+    {
+        $this->dateRetourReelle = $dateRetourReelle;
+    }
+
+    public function setPenalite(int $penalite): void
+    {
+        $this->penalite = $penalite;
+    }
+
+    public function setStatut(StatutEmprunt $statut): void
+    {
+        $this->statut = $statut;
+    }
+
+    public function marquerCommeProlonge(): void
+    {
+        $this->prolonge = true;
     }
 }
