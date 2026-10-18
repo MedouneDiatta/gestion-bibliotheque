@@ -9,6 +9,7 @@ use App\Core\Router;
 use App\Controller\DocumentController;
 use App\Controller\Admin\UtilisateurController;
 use App\Controller\AuthController;
+use App\Controller\EmpruntController;
 
 
 //  On instancie la requête pour écouter l'URL du navigateur
@@ -48,6 +49,22 @@ $router->get('/Bibliotech/admin/utilisateurs', [UtilisateurController::class, 'i
 $router->get('/login', [AuthController::class, 'loginForm']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->get('/logout', [AuthController::class, 'logout']);
+
+
+
+// --- ROUTES POUR LES EMPRUNTS ---
+
+// Afficher la liste des emprunts en cours du membre connecté
+$router->get('/Bibliotech/mes-emprunts', [EmpruntController::class, 'mesEmprunts']);
+
+// Traiter l'emprunt d'un document (soumission de formulaire en POST)
+$router->post('/Bibliotech/emprunter', [EmpruntController::class, 'emprunter']);
+
+// Traiter le retour d'un document
+$router->post('/Bibliotech/rendre', [EmpruntController::class, 'rendre']);
+
+// Traiter la prolongation d'un emprunt
+$router->post('/Bibliotech/prolonger', [EmpruntController::class, 'prolonger']);
 
 //  Le routeur analyse l'URL actuelle et exécute l'action correspondante
 try {
