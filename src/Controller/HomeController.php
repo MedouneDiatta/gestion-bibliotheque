@@ -1,20 +1,14 @@
-<?php 
-  declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
-  namespace App\Controller;
+namespace App\Controller;
 
-  use App\Core\Response;
-
-   //   la class qui gère la page d'accueil del 'application
-
-   final class HomeController extends Controller
-   {
-    public function index():Response 
+class HomeController extends Controller
+{
+    public function index(): string 
     {
-        // on retourn la vue d'accueil 
-        return $this->view('home',[
-            'titre' => 'Bienvenue sur BiblioTech'
+        return $this->view('home', [
+            'titre' => 'Accueil - BiblioTech'
         ]);
     }
-   }
-?>
+}

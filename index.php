@@ -1,75 +1,59 @@
 <?php
 declare(strict_types=1);
 session_start();
+
 // 1. On charge l'autoloader unique de Composer
 require_once __DIR__ . '/vendor/autoload.php';
 
 use App\Core\Request;
 use App\Core\Router;
+use App\Controller\HomeController;
 use App\Controller\DocumentController;
 use App\Controller\Admin\UtilisateurController;
 use App\Controller\AuthController;
 use App\Controller\EmpruntController;
+use App\Controller\ReservationController; // Si tu as ce contrôleur
 
-
-//  On instancie la requête pour écouter l'URL du navigateur
+// On instancie la requête pour écouter l'URL du navigateur
 $request = new Request();
 
-//  On instancie le routeur
+// On instancie le routeur
 $router = new Router();
 
-//  On définit nos routes
-$router->get('/Bibliotech/', function() {
-    return "<h1>Bienvenue sur l'accueil de Bibliotech !</h1>";
-});
+// --- ACCUEIL ---
+$router->get('/Bibliotech/', [HomeController::class, 'index']);
 
-// Route pour lister tous les documents
+// --- DOCUMENTS ---
 $router->get('/Bibliotech/documents', [DocumentController::class, 'index']);
-
-//  Route pour afficher la fiche détaillée d'un document
 $router->get('/Bibliotech/documents/show', [DocumentController::class, 'show']);
-
-// Route pour afficher le formulaire d'ajout d'un document
 $router->get('/Bibliotech/documents/create', [DocumentController::class, 'create']);
-
-// Route pour enregistrer les données du formulaire en base de données
 $router->post('/Bibliotech/documents/store', [DocumentController::class, 'store']);
-
-// route pour supprmer des docments
 $router->get('/Bibliotech/documents/delete', [DocumentController::class, 'delete']);
-
-// route pour la modification des document
 $router->get('/Bibliotech/documents/edit', [DocumentController::class, 'edit']);
 $router->post('/Bibliotech/documents/update', [DocumentController::class, 'update']);
 
-// Route pour lister tous les utilisateurs / membres
-$router->get('/Bibliotech/admin/utilisateurs', [UtilisateurController::class, 'index']);
-
-// Routes d'authentification
+// --- AUTHENTIFICATION ---
 $router->get('/login', [AuthController::class, 'loginForm']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->get('/logout', [AuthController::class, 'logout']);
 
-
-
-// --- ROUTES POUR LES EMPRUNTS ---
-
-// Afficher la liste des emprunts en cours du membre connecté
+// --- EMPRUNTS ---
 $router->get('/Bibliotech/mes-emprunts', [EmpruntController::class, 'mesEmprunts']);
-
-// Traiter l'emprunt d'un document (soumission de formulaire en POST)
 $router->post('/Bibliotech/emprunter', [EmpruntController::class, 'emprunter']);
-
-// Traiter le retour d'un document
 $router->post('/Bibliotech/rendre', [EmpruntController::class, 'rendre']);
-
-// Traiter la prolongation d'un emprunt
 $router->post('/Bibliotech/prolonger', [EmpruntController::class, 'prolonger']);
 
-//  Le routeur analyse l'URL actuelle et exécute l'action correspondante
+// --- ADMINISTRATION ---
+$router->get('/Bibliotech/admin/utilisateurs', [UtilisateurController::class, 'index']);
+
+// --- RÉSERVATIONS (Optionnel selon tes fichiers) ---
+// $router->get('/Bibliotech/reservations', [ReservationController::class, 'index']);
+// $router->post('/Bibliotech/reserver', [ReservationController::class, 'store']);
+
+// Le routeur analyse l'URL actuelle et exécute l'action correspondante
 try {
     $response = $router->resolve($request);
-    echo $response; // On affiche le résultat au navigateur
+    echo $response; 
 } catch (\Exception $e) {
     http_response_code(500);
     echo "<h1>Erreur serveur</h1><p>" . $e->getMessage() . "</p>";

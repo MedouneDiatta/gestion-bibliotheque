@@ -1,30 +1,38 @@
 <?php 
-  declare(strict_types=1);
+declare(strict_types=1);
 
-  namespace App\Controller;
+namespace App\Controller;
 
-  use App\Core\Response;
-  use App\Core\View;
+use App\Core\View;
 
-  //la class abstraite de base qui fournisse des raccourcis communs aux controllers
-  abstract class Controller
-  {
-    // une functin qui permet le racourcis pour afficher une vue avec des donnes
-    protected function view(string $template,array $data=[]):Response 
+// La classe abstraite de base qui fournit des raccourcis communs aux contrôleurs
+abstract class Controller
+{
+    /**
+     * Raccourci pour afficher une vue avec des données
+     */
+    protected function view(string $template, array $data = []): string 
     {
-        return Response::view($template,$data);
+        return View::render($template, $data);
     }
 
-    // celle ci permet le racourcis pour rediriger vers une url
-    protected function redirect(string $url):Response 
+    /**
+     * Raccourci pour rediriger vers une URL
+     */
+    protected function redirect(string $url): void 
     {
-        return Response::redirect($url);
+        header("Location: " . $url);
+        exit();
     }
 
-    // celle ci pour renvoyer une réponse json
-    protected function json(mixed $data,int $status=200):Response 
+    /**
+     * Raccourci pour renvoyer une réponse JSON
+     */
+    protected function json(mixed $data, int $status = 200): string 
     {
-          return Response::json($data,$status);
+        http_response_code($status);
+        header('Content-Type: application/json');
+        return json_encode($data);
     }
-  }   
+}   
 ?>
