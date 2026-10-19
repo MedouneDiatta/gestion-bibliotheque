@@ -10,13 +10,15 @@ use App\Repository\EmpruntRepository;
 use App\Exception\LimiteEmpruntAtteinteException;
 use App\Exception\DocumentIndisponibleException;
 use App\Exception\BiblioTechException;
+use App\Repository\ReservationRepository;
 
 final class EmpruntService
 {
     public function __construct(
         private \PDO $pdo,
         private DocumentRepository $documentRepository,
-        private EmpruntRepository $empruntRepository
+        private EmpruntRepository $empruntRepository,
+        private ReservationRepository $reservationRepository
     ) {}
 
     /**
@@ -85,66 +87,75 @@ final class EmpruntService
     /**
      * Enregistre le retour d'un document emprunté.
      */
-    public function rendre(int $empruntId): Emprunt
-    {
-        // Récupérer l'emprunt (assure-toi d'avoir une méthode find ou récupère-le via ton repository)
-        $emprunt = $this->empruntRepository->find($empruntId);
-        if ($emprunt->getStatut() === \App\Enum\StatutEmprunt::Rendu) {
-            throw new BiblioTechException("Cet emprunt a déjà été retourné.");
-        }
+   public function rendre(int $empruntId): Emprunt
+{
+    // Récupérer l'emprunt
+    $emprunt = $this->empruntRepository->find($empruntId);
+    if ($emprunt->getStatut() === \App\Enum\StatutEmprunt::Rendu) {
+        throw new BiblioTechException("Cet emprunt a déjà été retourné.");
+    }
 
-        // Récupérer le document associé pour connaître son tarif de pénalité
-        $document = $this->documentRepository->find($emprunt->getDocumentId());
+    // Récupérer le document associé
+    $document = $this->documentRepository->find($emprunt->getDocumentId());
 
-        $dateRetourReelle = new \DateTimeImmutable();
-        $dateRetourPrevue = $emprunt->getDateRetourPrevue();
+    $dateRetourReelle = new \DateTimeImmutable();
+    $dateRetourPrevue = $emprunt->getDateRetourPrevue();
 
-        $penalite = 0;
-        $statut = \App\Enum\StatutEmprunt::Rendu;
+    $penalite = 0;
+    $statut = \App\Enum\StatutEmprunt::Rendu;
 
-        //  Calculer le retard et les pénalités si la date réelle dépasse la date prévue
-        if ($dateRetourReelle > $dateRetourPrevue) {
-            $intervalle = $dateRetourPrevue->diff($dateRetourReelle);
-            $joursRetard = (int)$intervalle->days;
+    // Calculer le retard et les pénalités si la date réelle dépasse la date prévue
+    if ($dateRetourReelle > $dateRetourPrevue) {
+        $intervalle = $dateRetourPrevue->diff($dateRetourReelle);
+        $joursRetard = (int)$intervalle->days;
 
-            if ($joursRetard > 0) {
-                $statut = \App\Enum\StatutEmprunt::EnRetard;
-                // Tarif journalier fourni par le polymorphisme du document (ex: Livre = 100 FCFA, Magazine = 50 FCFA, DVD = 200 FCFA)
-                $tarifJour = $document->getTarifPenaliteJour();
-                $penaliteBrute = $joursRetard * $tarifJour;
+        if ($joursRetard > 0) {
+            $statut = \App\Enum\StatutEmprunt::EnRetard;
+            $tarifJour = $document->getTarifPenaliteJour();
+            $penaliteBrute = $joursRetard * $tarifJour;
 
-                // Plafonner la pénalité à 5000 FCFA (comme défini dans Emprunt::PENALITE_MAX)
-                $penalite = min($penaliteBrute, Emprunt::PENALITE_MAX);
-            }
-        }
-
-        // Démarrer une transaction SQL
-        $this->pdo->beginTransaction();
-
-        try {
-            // Remettre un exemplaire dans le stock du document
-            $document->ajouterExemplaire();
-            $this->documentRepository->save($document);
-
-            // Mettre à jour les propriétés de l'emprunt
-            $emprunt->setDateRetourReelle($dateRetourReelle);
-            $emprunt->setPenalite($penalite);
-            $emprunt->setStatut($statut);
-
-            // Sauvegarder l'emprunt mis à jour en base
-            $this->empruntRepository->save($emprunt);
-
-            // Valider la transaction
-            $this->pdo->commit();
-
-            return $emprunt;
-
-        } catch (\Throwable $e) {
-            // Annuler la transaction en cas d'erreur
-            $this->pdo->rollBack();
-            throw $e;
+            // Plafonner la pénalité à 5000 FCFA
+            $penalite = min($penaliteBrute, Emprunt::PENALITE_MAX);
         }
     }
+
+    // Démarrer une transaction SQL
+    $this->pdo->beginTransaction();
+
+    try {
+        // --- GESTION DES RÉSERVATIONS ET DU STOCK ---
+        $reservationsEnAttente = $this->reservationRepository->findEnAttenteParDocument($document->id);
+
+        if (!empty($reservationsEnAttente)) {
+            // Un membre attend ce document : on met l'exemplaire de côté pour le premier de la file
+            $premiereReservation = $reservationsEnAttente[0];
+            $premiereReservation->setStatut('disponible');
+            $this->reservationRepository->save($premiereReservation);
+        } else {
+            // Personne ne réserve ce document : on remet l'exemplaire dans le stock disponible
+            $document->ajouterExemplaire();
+            $this->documentRepository->save($document);
+        }
+
+        // Mettre à jour les propriétés de l'emprunt
+        $emprunt->setDateRetourReelle($dateRetourReelle);
+        $emprunt->setPenalite($penalite);
+        $emprunt->setStatut($statut);
+
+        // Sauvegarder l'emprunt mis à jour en base
+        $this->empruntRepository->save($emprunt);
+
+        // Valider la transaction
+        $this->pdo->commit();
+
+        return $emprunt;
+
+    } catch (\Throwable $e) {
+        // Annuler la transaction en cas d'erreur
+        $this->pdo->rollBack();
+        throw $e;
+    }
+}
 
     /**
      * Prolonge un emprunt existant d'une durée équivalente, si les conditions sont réunies.
